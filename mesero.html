@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mesero - Restaurante La Fuente</title>
+  <link rel="stylesheet" href="style.css">
+
+  <script>
+    if (!localStorage.getItem("meseroLoggedIn")) {
+      window.location.href = "login-mesero.html";
+    }
+  </script>
+</head>
+<body>
+
+  <header>
+    <h1>Mesero - Restaurante La Fuente</h1>
+  </header>
+
+  <main class="mesero">
+    <section class="pedido-formulario">
+      <h2>Registrar Pedido</h2>
+      
+      <form id="formulario-pedido">
+        <label for="cliente">Cliente:</label>
+        <input type="text" id="cliente" placeholder="Nombre del cliente" required>
+
+        <label for="mesa">Mesa:</label>
+        <input type="text" id="mesa" placeholder="Número o nombre de mesa" required>
+        
+        <label for="folio">Folio:</label>
+        <input type="text" id="folio" disabled>
+
+        <label for="productos">Selecciona los productos:</label>
+        <select id="productos" multiple required></select>        
+
+        <div>
+          <p><strong>Subtotal:</strong> $<span id="subtotal">0</span></p>
+          <p><strong>Total:</strong> $<span id="total">0</span></p>
+        </div>
+
+        <button type="submit">Registrar Pedido</button>
+      </form>
+    </section>
+
+    <section class="pedidos-registrados">
+      <h2>Pedidos Registrados</h2>
+      <div id="lista-pedidos"></div>
+    </section>
+  </main>
+
+  <button id="logoutMeseroBtn" class="logout-btn">Cerrar sesión</button>
+
+  <footer>
+    <p><a href="index.html">← Volver a la Página Principal</a></p>
+    <p>© 2025 La Fuente</p>
+  </footer>
+
+  <script>
+    const productosSelect = document.getElementById("productos");
+    const subtotalElement = document.getElementById("subtotal");
+    const totalElement = document.getElementById("total");
+    const listaPedidos = document.getElementById("lista-pedidos");
+
+    const productos = [
+      { nombre: "Chilaquiles Rojos, Verdes o Divorciados", precio: 66 },
+      { nombre: "Chilaquiles con Huevo", precio: 76 },
+      { nombre: "Chilaquiles con Pollo", precio: 84 },
+      { nombre: "Chilaquiles con Carne Asada", precio: 84 },
+      { nombre: "Huevos al Gusto Rancheros", precio: 66 },
+      { nombre: "Huevos al Gusto a la Mexicana", precio: 66 },
+      { nombre: "Huevos al Gusto con Jamón, Tocino, Chorizo o Salchicha", precio: 84 },
+      { nombre: "Omeletes Sencillo", precio: 70 },
+      { nombre: "Omeletes Combinado con 2 Ingredientes", precio: 70 },
+      { nombre: "Platelitos Chicharrón en Salsa", precio: 66 },
+      { nombre: "Platelitos Carne Asada Salsa Verde o Roja", precio: 80 },
+      { nombre: "Pechuga de Pollo a la Plancha", precio: 90 },
+      { nombre: "Molletes con Chorizo, Tocino o Jamón", precio: 50 },
+      { nombre: "Rancheros con Salsa Mexicana", precio: 55 },
+      { nombre: "Dulces Azúcar, Mermelada, Cajeta o Lechera", precio: 50 },
+      { nombre: "Pepitos con Generosa Porción de Frijoles", precio: 75 },
+      { nombre: "Hot Cakes", precio: 55 },
+      { nombre: "Hot Cakes con Frutas", precio: 60 },
+      { nombre: "Enchiladas Sencillas", precio: 55 },
+      { nombre: "Enchiladas con Bistec", precio: 60 },
+      { nombre: "Yogurt con Frutas", precio: 43 },
+      { nombre: "Ensaladas Vegetales", precio: 55 },
+      { nombre: "Ensaladas de Pollo o Atún", precio: 75 },
+      { nombre: "Jugos Naturales", precio: 30 },
+      { nombre: "Limonada", precio: 32 },
+      { nombre: "Licuados de Frutas", precio: 35 },
+      { nombre: "Chocomilk", precio: 35 },
+      { nombre: "Café al Gusto", precio: 22 },
+      { nombre: "Refrescos", precio: 27 },
+      { nombre: "Aguas Frescas", precio: 27 }
+    ];
+
+    productos.forEach(producto => {
+      const option = document.createElement("option");
+      option.value = producto.precio;
+      option.textContent = `${producto.nombre} - $${producto.precio}`;
+      productosSelect.appendChild(option);
+    });
+
+    function generarFolio() {
+      const randomNum = Math.floor(Math.random() * 1000000);
+      const timestamp = Date.now();
+      return `FOLIO-${randomNum}-${timestamp}`;
+    }
+
+    document.getElementById("folio").value = generarFolio();
+
+    productosSelect.addEventListener("change", function() {
+      let subtotal = 0;
+      const selectedOptions = Array.from(productosSelect.selectedOptions);
+      selectedOptions.forEach(option => {
+        subtotal += parseFloat(option.value);
+      });
+
+      subtotalElement.innerText = subtotal;
+      totalElement.innerText = subtotal;
+    });
+
+    function mostrarPedidos() {
+      const pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+      listaPedidos.innerHTML = "";
+
+      if (pedidos.length === 0) {
+        listaPedidos.innerHTML = "<p>No hay pedidos registrados.</p>";
+      } else {
+        pedidos.forEach(pedido => {
+          const divPedido = document.createElement("div");
+          divPedido.classList.add("pedido");
+          divPedido.innerHTML = `
+            <p><strong>Folio:</strong> ${pedido.folio}</p>
+            <p><strong>Mesa:</strong> ${pedido.mesa}</p>
+            <p><strong>Cliente:</strong> ${pedido.cliente}</p>
+            <p><strong>Productos:</strong> ${pedido.productos}</p>
+            <p><strong>Total:</strong> $${pedido.total}</p>
+            <button class="imprimir-btn" data-folio="${pedido.folio}">Imprimir</button>
+          `;
+          listaPedidos.appendChild(divPedido);
+        });
+      }
+    }
+
+    // Función para imprimir el pedido seleccionado
+    function imprimirPedido(folio) {
+      const pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+      const pedido = pedidos.find(p => p.folio === folio);
+
+      if (pedido) {
+        let ticket = `
+          <h1>Tienda La Fuente</h1>
+          <p><strong>Cliente:</strong> ${pedido.cliente}</p>
+          <p><strong>Mesa:</strong> ${pedido.mesa}</p>
+          <p><strong>Productos:</strong> ${pedido.productos}</p>
+          <p><strong>Total:</strong> $${pedido.total}</p>
+          <p>Gracias por su compra!</p>
+        `;
+
+        const printWindow = window.open('', '', 'width=600,height=400');
+        printWindow.document.write(ticket);
+        printWindow.document.close();
+        printWindow.print();
+      }
+    }
+
+    document.addEventListener("click", function(event) {
+      if (event.target && event.target.classList.contains("imprimir-btn")) {
+        const folio = event.target.getAttribute("data-folio");
+        imprimirPedido(folio);
+      }
+    });
+
+    const formulario = document.getElementById("formulario-pedido");
+    formulario.addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      const cliente = document.getElementById("cliente").value;
+      const mesa = document.getElementById("mesa").value;
+      const productosSeleccionados = Array.from(productosSelect.selectedOptions).map(option => option.text).join(", ");
+      const total = parseFloat(totalElement.innerText);
+
+      const nuevoPedido = {
+        folio: generarFolio(),
+        cliente: cliente,
+        mesa: mesa,
+        productos: productosSeleccionados,
+        total: total,
+        origen: "Mesero"
+      };
+
+      const pedidosGuardados = JSON.parse(localStorage.getItem("pedidos")) || [];
+      pedidosGuardados.push(nuevoPedido);
+      localStorage.setItem("pedidos", JSON.stringify(pedidosGuardados));
+
+      formulario.reset();
+      mostrarPedidos();
+      alert("Pedido registrado con éxito!");
+    });
+
+    mostrarPedidos();
+
+    document.getElementById("logoutMeseroBtn").addEventListener("click", function() {
+      localStorage.removeItem("meseroLoggedIn");
+      window.location.href = "login-mesero.html";
+    });
+  </script>
+
+</body>
+</html>

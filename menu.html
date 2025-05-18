@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Menú - Restaurante La Fuente</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header>
+    <h1>Menú - Restaurante La Fuente</h1>
+  </header>
+
+  <nav class="menu-navegacion">
+    <ul>
+      <li><a href="index.html" class="boton">Volver a la Página Principal</a></li>
+    </ul>
+  </nav>
+
+  <main class="menu">
+    <div class="categoria-btn-container">
+      <button class="categoria-btn" onclick="mostrarCategoria('desayunos')">Desayunos</button>
+      <button class="categoria-btn" onclick="mostrarCategoria('antojitos')">Antojitos</button>
+      <button class="categoria-btn" onclick="mostrarCategoria('jugos')">Jugos Naturales</button>
+      <button class="categoria-btn" onclick="mostrarCategoria('ensaladas')">Ensaladas</button>
+      <button class="categoria-btn" onclick="mostrarCategoria('extras')">Extras</button>
+    </div>
+
+    <!-- Categoría: Desayunos -->
+    <section class="categoria" id="desayunos">
+      <h2>Desayunos</h2>
+      <div class="productos-con-imagenes">
+        <ul class="productos-lista">
+          <li>Chilaquiles Rojos, Verdes o Divorciados - $66</li>
+          <li>Con Huevo - $76</li>
+          <li>Con Pollo - $84</li>
+          <li>Suizos (Gratinados) - $84</li>
+          <li>Huevos al Gusto - $66</li>
+          <li>Solo claras - $70</li>
+          <li>Omelettes Sencillo - $70</li>
+          <li>Platos Chicharrón en Salsa - $66</li>
+        </ul>
+        <div class="imagenes-desayunos">
+          <img src="img/chilaquiles rojos.jpg" alt="Chilaquiles Rojos" class="imagen-categoria" onclick="cambiarImagen('desayunos')"/>
+          <img src="img/chilaquiles verdes.jpg" alt="Chilaquiles Verdes" class="imagen-categoria" style="display: none;" onclick="cambiarImagen('desayunos')"/>
+          <img src="img/omelette.jpg" alt="Omelette" class="imagen-categoria" style="display: none;" onclick="cambiarImagen('desayunos')"/>
+        </div>
+      </div>
+    </section>
+
+    <!-- Categoría: Antojitos -->
+    <section class="categoria" id="antojitos">
+      <h2>Antojitos</h2>
+      <div class="productos-con-imagenes">
+        <ul class="productos-lista">
+          <li>Lonches - $50</li>
+          <li>Torta Ahogada - $60</li>
+          <li>Sandwiches - $55</li>
+          <li>Hamburguesas - $56</li>
+          <li>Hot Dogs - $56</li>
+          <li>Quesadillas - $55</li>
+          <li>Gringas (1 pieza) - $24</li>
+          <li>Tacos Dorados (Orden de 3) - $55</li>
+          <li>Tacos Bandidos - $55</li>
+        </ul>
+        <div class="imagenes-antojitos">
+          <img src="img/lonches.jpg" alt="Lonches" class="imagen-categoria" onclick="cambiarImagen('antojitos')"/>
+          <img src="img/mix de todo.jpeg" alt="Mix de todo" class="imagen-categoria" style="display: none;" onclick="cambiarImagen('antojitos')"/>
+        </div>
+      </div>
+    </section>
+
+    <!-- Categoría: Jugos -->
+    <section class="categoria" id="jugos">
+      <h2>Jugos Naturales</h2>
+      <div class="productos-con-imagenes">
+        <ul class="productos-lista">
+          <li>Naranja - $30</li>
+          <li>Zanahoria y Mixtos - $30</li>
+          <li>Limonada - $32</li>
+          <li>Licuados - $35</li>
+          <li>Chocolate - $35</li>
+          <li>Café al gusto - $22</li>
+          <li>Aguas Frescas (1 L) - $27</li>
+        </ul>
+        <div class="imagenes-jugos">
+          <img src="img/jugos.webp" alt="Jugos" class="imagen-categoria" onclick="cambiarImagen('jugos')"/>
+          <img src="img/licuados.jpg" alt="Licuados" class="imagen-categoria" style="display: none;" onclick="cambiarImagen('jugos')"/>
+        </div>
+      </div>
+    </section>
+
+    <!-- Categoría: Ensaladas -->
+    <section class="categoria" id="ensaladas">
+      <h2>Ensaladas</h2>
+      <div class="productos-con-imagenes">
+        <ul class="productos-lista">
+          <li>Vegetales (saludable) - $55</li>
+          <li>César - $75</li>
+          <li>Pollo - $75</li>
+          <li>Atún - $75</li>
+          <li>Ensalada de frutas - $55</li>
+        </ul>
+        <div class="imagenes-ensaladas">
+          <img src="img/Ensalada-pollo-vinagreta-limon.webp" alt="Ensalada Vegetales" class="imagen-categoria" onclick="cambiarImagen('ensaladas')" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Categoría: Extras -->
+    <section class="categoria" id="extras">
+      <h2>Extras</h2>
+      <div class="productos-con-imagenes">
+        <ul class="productos-lista">
+          <li>Yogurt con frutas - $43</li>
+          <li>Escamochas - $43</li>
+          <li>Comida Corrida - $100</li>
+        </ul>
+        <div class="imagenes-extras">
+          <img src="img/fruta con yogurt.jpeg" alt="Yogurt" class="imagen-categoria" onclick="cambiarImagen('extras')" />
+          <img src="img/images.jpeg" alt="Escamochas" class="imagen-categoria" style="display: none;" onclick="cambiarImagen('extras')" />
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 Restaurante La Fuente</p>
+  </footer>
+
+  <script>
+    function mostrarCategoria(categoria) {
+      document.querySelectorAll('.categoria').forEach(c => c.style.display = 'none');
+      document.getElementById(categoria).style.display = 'block';
+    }
+
+    function cambiarImagen(categoria) {
+      const imagenes = document.querySelectorAll(`#${categoria} .imagen-categoria`);
+      const actual = Array.from(imagenes).find(img => img.style.display !== 'none');
+      actual.style.display = 'none';
+      const siguiente = (Array.from(imagenes).indexOf(actual) + 1) % imagenes.length;
+      imagenes[siguiente].style.display = 'block';
+    }
+  </script>
+
+</body>
+</html>

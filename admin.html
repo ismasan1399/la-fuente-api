@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administrador - La Fuente</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <h1>Administrador - Restaurante La Fuente</h1>
+    <button id="logoutBtn" class="logout-btn">Cerrar sesión</button>
+  </header>
+
+  <main class="administrador">
+    <section class="pedidos-registrados">
+      <h2>Pedidos Registrados</h2>
+      <div id="lista-pedidos"></div>
+    </section>
+
+    <section class="notificaciones">
+      <h2>Administración de Notificaciones</h2>
+      <div id="notificaciones"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p><a href="index.html">← Volver a la Página Principal</a></p>
+    <p>© 2025 La Fuente</p>
+  </footer>
+
+  <script>
+    if (!localStorage.getItem("loggedIn")) {
+      window.location.href = "login.html";
+    }
+
+    document.getElementById("logoutBtn").addEventListener("click", function() {
+      localStorage.removeItem("loggedIn");
+      window.location.href = "login.html";
+    });
+
+    const listaPedidos = document.getElementById("lista-pedidos");
+    const notificaciones = document.getElementById("notificaciones");
+
+    function mostrarPedidos() {
+      const pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+      listaPedidos.innerHTML = "";
+
+      if (pedidos.length === 0) {
+        listaPedidos.innerHTML = "<p>No hay pedidos registrados.</p>";
+      } else {
+        pedidos.forEach(pedido => {
+          const divPedido = document.createElement("div");
+          divPedido.classList.add("pedido");
+          divPedido.innerHTML = `
+            <p><strong>Folio:</strong> ${pedido.folio}</p>
+            <p><strong>Cliente:</strong> ${pedido.cliente}</p>
+            <p><strong>Productos:</strong> ${pedido.productos}</p>
+            <p><strong>Total:</strong> $${pedido.total}</p>
+            <p><strong>Origen:</strong> ${pedido.origen}</p>
+            <p><strong>Estado:</strong> ${pedido.estado || 'Pendiente'}</p>
+            <button onclick="actualizarEstado('${pedido.folio}')">Actualizar Estado</button>
+          `;
+          listaPedidos.appendChild(divPedido);
+        });
+      }
+    }
+
+    function actualizarEstado(folio) {
+      const nuevoEstado = prompt("Ingrese el nuevo estado del pedido:");
+
+      if (nuevoEstado) {
+        let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+        const index = pedidos.findIndex(p => p.folio === folio);
+
+        if (index !== -1) {
+          if (nuevoEstado.toLowerCase() === "terminado") {
+            pedidos.splice(index, 1); // Elimina el pedido si está terminado
+            alert("Pedido eliminado por estar terminado.");
+          } else {
+            pedidos[index].estado = nuevoEstado;
+            alert("Estado actualizado correctamente.");
+          }
+
+          localStorage.setItem("pedidos", JSON.stringify(pedidos));
+          mostrarPedidos();
+          mostrarNotificaciones();
+        }
+      }
+    }
+
+    function mostrarNotificaciones() {
+      const pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+      notificaciones.innerHTML = "";
+
+      pedidos.forEach(pedido => {
+        if (pedido.estado) {
+          const divNotificacion = document.createElement("div");
+          divNotificacion.classList.add("notificacion");
+          divNotificacion.innerHTML = `
+            <p><strong>Folio:</strong> ${pedido.folio} - <strong>Estado:</strong> ${pedido.estado}</p>
+          `;
+          notificaciones.appendChild(divNotificacion);
+        }
+      });
+    }
+
+    mostrarPedidos();
+    mostrarNotificaciones();
+  </script>
+
+</body>
+</html>

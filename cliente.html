@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cliente - La Fuente</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <h1>Cliente - Restaurante La Fuente</h1>
+  </header>
+
+  <main class="cliente">
+    <section class="pedido-formulario">
+      <h2>Realizar Pedido</h2>
+      
+      <form id="formulario-pedido-cliente">
+        <label for="cliente">Cliente:</label>
+        <input type="text" id="cliente" placeholder="Nombre del cliente" required>
+        
+        <label for="folio">Folio:</label>
+        <input type="text" id="folio" disabled>
+
+        <label for="productos">Selecciona los productos:</label>
+        <select id="productos" multiple required>
+          <!-- Los productos se agregarán dinámicamente aquí -->
+        </select>        
+
+        <div>
+          <p><strong>Subtotal:</strong> $<span id="subtotal">0</span></p>
+          <p><strong>Total:</strong> $<span id="total">0</span></p>
+        </div>
+
+        <button type="submit">Confirmar Pedido</button>
+      </form>
+    </section>
+  </main>
+
+  <footer>
+    <p><a href="index.html">← Volver a la Página Principal</a></p>
+    <p>© 2025 La Fuente</p>
+  </footer>
+
+  <script>
+    const productosSelect = document.getElementById("productos");
+    const subtotalElement = document.getElementById("subtotal");
+    const totalElement = document.getElementById("total");
+
+    // Lista de productos disponibles
+    const productos = [
+      { nombre: "Chilaquiles Rojos, Verdes o Divorciados", precio: 66 },
+      { nombre: "Chilaquiles con Huevo", precio: 76 },
+      { nombre: "Chilaquiles con Pollo", precio: 84 },
+      { nombre: "Chilaquiles con Carne Asada", precio: 84 },
+      { nombre: "Huevos al Gusto Rancheros", precio: 66 },
+      { nombre: "Huevos al Gusto a la Mexicana", precio: 66 },
+      { nombre: "Huevos al Gusto con Jamón, Tocino, Chorizo o Salchicha", precio: 84 },
+      { nombre: "Omeletes Sencillo", precio: 70 },
+      { nombre: "Omeletes Combinado con 2 Ingredientes", precio: 70 },
+      { nombre: "Platelitos Chicharrón en Salsa", precio: 66 },
+      { nombre: "Platelitos Carne Asada Salsa Verde o Roja", precio: 80 },
+      { nombre: "Pechuga de Pollo a la Plancha", precio: 90 },
+      { nombre: "Molletes con Chorizo, Tocino o Jamón", precio: 50 },
+      { nombre: "Rancheros con Salsa Mexicana", precio: 55 },
+      { nombre: "Dulces Azúcar, Mermelada, Cajeta o Lechera", precio: 50 },
+      { nombre: "Pepitos con Generosa Porción de Frijoles", precio: 75 },
+      { nombre: "Hot Cakes", precio: 55 },
+      { nombre: "Hot Cakes con Frutas", precio: 60 },
+      { nombre: "Enchiladas Sencillas", precio: 55 },
+      { nombre: "Enchiladas con Bistec", precio: 60 },
+      { nombre: "Yogurt con Frutas", precio: 43 },
+      { nombre: "Ensaladas Vegetales", precio: 55 },
+      { nombre: "Ensaladas de Pollo o Atún", precio: 75 },
+      { nombre: "Jugos Naturales", precio: 30 },
+      { nombre: "Limonada", precio: 32 },
+      { nombre: "Licuados de Frutas", precio: 35 },
+      { nombre: "Chocomilk", precio: 35 },
+      { nombre: "Café al Gusto", precio: 22 },
+      { nombre: "Refrescos", precio: 27 },
+      { nombre: "Aguas Frescas", precio: 27 }
+    ];
+
+    // Seleccionar el elemento `select` donde agregar los productos
+    productos.forEach(producto => {
+      const option = document.createElement("option");
+      option.value = producto.precio;
+      option.textContent = `${producto.nombre} - $${producto.precio}`;
+      productosSelect.appendChild(option);
+    });
+
+    // Generar folio aleatorio
+    function generarFolio() {
+      const randomNum = Math.floor(Math.random() * 1000000); // Genera un número aleatorio
+      const timestamp = Date.now(); // Agrega el timestamp para mayor unicidad
+      return `FOLIO-${randomNum}-${timestamp}`;
+    }
+
+    // Asignar el folio generado al input
+    document.getElementById("folio").value = generarFolio(); // Al cargar la página, asignamos el folio
+
+    // Actualizar el subtotal y el total cuando el cliente selecciona productos
+    productosSelect.addEventListener("change", function() {
+      let subtotal = 0;
+      const selectedOptions = Array.from(productosSelect.selectedOptions);
+      
+      selectedOptions.forEach(option => {
+        subtotal += parseFloat(option.value);
+      });
+
+      subtotalElement.innerText = subtotal;
+      totalElement.innerText = subtotal; // Si no hay impuestos, el total es igual al subtotal
+    });
+
+    // Manejar el envío del formulario
+    const formularioCliente = document.getElementById("formulario-pedido-cliente");
+    formularioCliente.addEventListener("submit", function(event) {
+      event.preventDefault(); // Evitar que se recargue la página
+
+      const cliente = document.getElementById("cliente").value;
+      const productosSeleccionados = Array.from(productosSelect.selectedOptions).map(option => option.text).join(", ");
+      const total = parseFloat(totalElement.innerText);
+
+      // Crear un nuevo pedido con un folio aleatorio
+      const nuevoPedido = {
+        folio: generarFolio(),
+        cliente: cliente,
+        productos: productosSeleccionados,
+        total: total
+      };
+
+      // Guardar el pedido en Local Storage
+      const pedidosGuardados = JSON.parse(localStorage.getItem("pedidos")) || [];
+      pedidosGuardados.push(nuevoPedido);
+      localStorage.setItem("pedidos", JSON.stringify(pedidosGuardados));
+
+      // Limpiar el formulario
+      formularioCliente.reset();
+      alert("Pedido registrado con éxito!");
+    });
+
+  </script>
+
+</body>
+</html>
