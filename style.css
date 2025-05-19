@@ -136,17 +136,17 @@ footer {
   border-radius: 10px;
   margin: 10px 0; /* Espaciado entre las imágenes */
 }
-
 footer {
   background-color: #ff6b6b;
   color: white;
   text-align: center;
-  padding: 2.5px 5px; /* Reducimos padding */
-  font-size: 0.8em; /* Tamaño de texto más pequeño */
-  position: fixed;
+  padding: 10px;
+  font-size: 0.8em;
   width: 100%;
+  position: relative; /* Antes era 'fixed' */
   bottom: 0;
 }
+
 
 footer p {
   margin: 2px 0; /* Espacio reducido entre líneas */

@@ -1,27 +1,43 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Administrador - La Fuente</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Administrador - Restaurante La Fuente</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      .ticket, .ticket * {
+        visibility: visible;
+      }
+      .ticket {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 250px;
+        font-size: 12px;
+        padding: 10px;
+        font-family: monospace;
+        background: white;
+      }
+    }
+  </style>
 </head>
-<body>
 
+<body>
   <header>
-    <h1>Administrador - Restaurante La Fuente</h1>
-    <button id="logoutBtn" class="logout-btn">Cerrar sesión</button>
+    <h1>Administrador-Restaurante La Fuente</h1>
+    <button onclick="cargarPedidos()">🔄 Actualizar</button>
+    <button id="cerrar-sesion">Cerrar sesión</button>
   </header>
 
   <main class="administrador">
     <section class="pedidos-registrados">
       <h2>Pedidos Registrados</h2>
       <div id="lista-pedidos"></div>
-    </section>
-
-    <section class="notificaciones">
-      <h2>Administración de Notificaciones</h2>
-      <div id="notificaciones"></div>
     </section>
   </main>
 
@@ -31,84 +47,102 @@
   </footer>
 
   <script>
-    if (!localStorage.getItem("loggedIn")) {
-      window.location.href = "login.html";
-    }
-
-    document.getElementById("logoutBtn").addEventListener("click", function() {
+    document.getElementById("cerrar-sesion").addEventListener("click", () => {
       localStorage.removeItem("loggedIn");
-      window.location.href = "login.html";
+      window.location.href = "login-administrador.html";
     });
 
-    const listaPedidos = document.getElementById("lista-pedidos");
-    const notificaciones = document.getElementById("notificaciones");
+    async function cargarPedidos() {
+      const listaPedidos = document.getElementById("lista-pedidos");
+      listaPedidos.innerHTML = "Cargando pedidos...";
 
-    function mostrarPedidos() {
-      const pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
-      listaPedidos.innerHTML = "";
+      try {
+        const respuesta = await fetch("http://localhost:3000/api/pedidos");
+        const pedidos = await respuesta.json();
 
-      if (pedidos.length === 0) {
-        listaPedidos.innerHTML = "<p>No hay pedidos registrados.</p>";
-      } else {
-        pedidos.forEach(pedido => {
-          const divPedido = document.createElement("div");
-          divPedido.classList.add("pedido");
-          divPedido.innerHTML = `
-            <p><strong>Folio:</strong> ${pedido.folio}</p>
-            <p><strong>Cliente:</strong> ${pedido.cliente}</p>
-            <p><strong>Productos:</strong> ${pedido.productos}</p>
-            <p><strong>Total:</strong> $${pedido.total}</p>
-            <p><strong>Origen:</strong> ${pedido.origen}</p>
-            <p><strong>Estado:</strong> ${pedido.estado || 'Pendiente'}</p>
-            <button onclick="actualizarEstado('${pedido.folio}')">Actualizar Estado</button>
-          `;
-          listaPedidos.appendChild(divPedido);
-        });
+        if (pedidos.length === 0) {
+          listaPedidos.innerHTML = "<p>No hay pedidos registrados.</p>";
+        } else {
+          listaPedidos.innerHTML = "";
+          pedidos.forEach(pedido => {
+            const div = document.createElement("div");
+            div.classList.add("pedido");
+
+            const productosTexto = pedido.productos.map(p => p.nombre).join(", ");
+
+            div.innerHTML = `
+              <p><strong>Folio:</strong> ${pedido.folio || "Sin folio"}</p>
+              <p><strong>Cliente:</strong> ${pedido.cliente || "Sin nombre"}</p>
+              <p><strong>Tipo:</strong> ${pedido.tipo === "domicilio" ? "Domicilio" : "En mesa"}</p>
+              ${pedido.tipo === "domicilio" ? `
+                <p><strong>Teléfono:</strong> ${pedido.telefono || "Sin teléfono"}</p>
+                <p><strong>Dirección:</strong> ${pedido.direccion || "Sin dirección"}</p>
+              ` : `
+                <p><strong>Mesa:</strong> ${pedido.mesa || "Sin mesa"}</p>
+              `}
+              <p><strong>Total:</strong> $${pedido.total}</p>
+              <p><strong>Productos:</strong> ${productosTexto}</p>
+              <label for="estado-${pedido._id}">Estado:</label>
+              <select id="estado-${pedido._id}">
+                <option value="pendiente" ${pedido.estado === "pendiente" ? "selected" : ""}>pendiente</option>
+                <option value="en proceso" ${pedido.estado === "en proceso" ? "selected" : ""}>en proceso</option>
+                <option value="terminado" ${pedido.estado === "terminado" ? "selected" : ""}>terminado</option>
+              </select>
+              <button onclick="guardarEstado('${pedido._id}')">Guardar</button>
+              <button onclick="imprimirTicket(${JSON.stringify(pedido).replace(/"/g, '&quot;')})" class="imprimir-btn">🧾 Imprimir</button>
+            `;
+
+            listaPedidos.appendChild(div);
+          });
+        }
+      } catch (error) {
+        console.error("❌ Error al cargar pedidos:", error);
+        listaPedidos.innerHTML = "<p>❌ Error al conectar con el servidor.</p>";
       }
     }
 
-    function actualizarEstado(folio) {
-      const nuevoEstado = prompt("Ingrese el nuevo estado del pedido:");
+    async function guardarEstado(id) {
+      const nuevoEstado = document.getElementById(`estado-${id}`).value;
 
-      if (nuevoEstado) {
-        let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
-        const index = pedidos.findIndex(p => p.folio === folio);
-
-        if (index !== -1) {
-          if (nuevoEstado.toLowerCase() === "terminado") {
-            pedidos.splice(index, 1); // Elimina el pedido si está terminado
-            alert("Pedido eliminado por estar terminado.");
-          } else {
-            pedidos[index].estado = nuevoEstado;
-            alert("Estado actualizado correctamente.");
-          }
-
-          localStorage.setItem("pedidos", JSON.stringify(pedidos));
-          mostrarPedidos();
-          mostrarNotificaciones();
+      if (nuevoEstado === "terminado") {
+        if (confirm("¿Estás seguro de que quieres marcar este pedido como terminado y eliminarlo?")) {
+          await fetch(`http://localhost:3000/api/pedidos/${id}`, { method: "DELETE" });
+          cargarPedidos();
+          return;
         }
       }
-    }
 
-    function mostrarNotificaciones() {
-      const pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
-      notificaciones.innerHTML = "";
-
-      pedidos.forEach(pedido => {
-        if (pedido.estado) {
-          const divNotificacion = document.createElement("div");
-          divNotificacion.classList.add("notificacion");
-          divNotificacion.innerHTML = `
-            <p><strong>Folio:</strong> ${pedido.folio} - <strong>Estado:</strong> ${pedido.estado}</p>
-          `;
-          notificaciones.appendChild(divNotificacion);
-        }
+      await fetch(`http://localhost:3000/api/pedidos/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ estado: nuevoEstado })
       });
+
+      cargarPedidos();
     }
 
-    mostrarPedidos();
-    mostrarNotificaciones();
-  </script>
+    function imprimirTicket(pedido) {
+      const ticket = document.createElement("div");
+      ticket.className = "ticket";
+      ticket.innerHTML = `
+        <h3>🍽 Restaurante La Fuente</h3>
+        <p><strong>Folio:</strong> ${pedido.folio}</p>
+        <p><strong>Cliente:</strong> ${pedido.cliente}</p>
+        <p><strong>${pedido.tipo === "domicilio" ? "Dirección" : "Mesa"}:</strong> ${pedido.tipo === "domicilio" ? pedido.direccion : pedido.mesa}</p>
+        ${pedido.tipo === "domicilio" ? `<p><strong>Teléfono:</strong> ${pedido.telefono}</p>` : ""}
+        <p><strong>Productos:</strong></p>
+        <ul>
+          ${pedido.productos.map(p => `<li>${p.nombre}</li>`).join("")}
+        </ul>
+        <p><strong>Total:</strong> $${pedido.total}</p>
+        <p>🕒 ${new Date().toLocaleString()}</p>
+      `;
+      document.body.appendChild(ticket);
+      window.print();
+      document.body.removeChild(ticket);
+    }
 
+    window.onload = cargarPedidos;
+  </script>
 </body>
 </html>

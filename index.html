@@ -1,36 +1,100 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Restaurante La Fuente</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #fdfdfd;
+      color: #333;
+      text-align: center;
+    }
+
+    header {
+      background-color: #ff6b6b;
+      padding: 20px;
+      color: white;
+    }
+
+    nav.menu-navegacion {
+      margin: 20px auto;
+    }
+
+    nav.menu-navegacion ul {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .boton {
+      background-color: #ff6b6b;
+      color: white;
+      padding: 15px 25px;
+      font-size: 1.1em;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background-color 0.3s;
+    }
+
+    .boton:hover {
+      background-color: #e05353;
+    }
+
+    .contenedor img {
+      max-width: 90%;
+      height: auto;
+      margin: 20px auto;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    footer {
+      background-color: #ff6b6b;
+      color: white;
+      padding: 10px;
+      font-size: 0.9em;
+      position: fixed;
+      width: 100%;
+      bottom: 0;
+    }
+
+    @media (max-width: 600px) {
+      .boton {
+        font-size: 1em;
+        padding: 12px 20px;
+      }
+    }
+  </style>
 </head>
 <body>
 
   <header>
     <h1>"La Fuente"</h1>
-    <p>Restaurante con el mejor sabor casero  </p>
+    <p>Restaurante con el mejor sabor casero</p>
   </header>
 
   <nav class="menu-navegacion">
     <ul>
-        <li><a href="cliente.html" class="boton">Cliente</a></li>
-        <li><a href="menu.html" class="boton">Menú</a></li>
-        <li><a href="login mesero.html" class="boton">Mesero</a></li>
-        <li><a href="admin.html" class="boton">Administrador</a></li>
+      <li><a href="cliente.html" class="boton">Cliente</a></li>
+      <li><a href="menu.html" class="boton">Menú</a></li>
+      <li><a href="login-mesero.html" class="boton">Mesero</a></li>
+      <li><a href="login-administrador.html" class="boton">Administrador</a></li>
     </ul>
   </nav>
 
-  <style>
-    .contenedor {
-      text-align: center;
-    }
-  </style>
-  
   <div class="contenedor">
-  <img src="img/lafuenteimg.jpg" alt="la fuente"> 
- </div>
+    <img src="img/lafuenteimg.jpg" alt="La Fuente">
+  </div>
+
   <footer>
     <p>© 2025 La Fuente - Restaurante con el mejor sabor casero</p>
   </footer>
